@@ -55,6 +55,12 @@ space.post("/", userMiddleware, async (req, res) => {
                     id: mapId
                 }
             })
+
+            const mapElements = await prisma.mapElements.findMany({
+                where: {
+                    mapId: map?.id
+                }
+            })
     
             if(!map) {
                 res.status(400).json({
@@ -73,6 +79,15 @@ space.post("/", userMiddleware, async (req, res) => {
                 }
             })
     
+            const spaceElement = await prisma.spaceElements.createMany({
+                data: mapElements.map(e => ({
+                    elementId: e.elementId,
+                    spaceId: space.id,
+                    x: e.x,
+                    y: e.y
+                }))
+            })
+
             res.json({
                 spaceId: space.id
             })
@@ -95,6 +110,13 @@ space.delete("/:spaceId", userMiddleware, async (req, res) => {
                 id: spaceId
             }
         })
+
+        if(req.userId !== space.creatorId) {
+            res.status(400).json({
+                message: "You havent created this space"
+            })
+            return
+        }
 
         res.json({
             message: "Space deleted successfully"
@@ -160,15 +182,7 @@ space.get("/:spaceId", userMiddleware, async (req, res) => {
                 elementId: true,
                 x: true,
                 y: true,
-                element: {
-                    select: {
-                        id: true,
-                        imageUrl: true,
-                        static: true,
-                        height: true,
-                        width: true
-                    }
-                }
+                element: true
             }
         })
 
@@ -178,18 +192,11 @@ space.get("/:spaceId", userMiddleware, async (req, res) => {
             })
             return
         }
-
         res.json({
             dimensions: `${space.width}x${space.height}`,
             elements: spaceElements.map(e => ({
                 id: e.id,
-                element: {
-                    id: e.element.id,
-                    imageUrl: e.element.imageUrl,
-                    static: e.element.static,
-                    height: e.element.height,
-                    widht: e.element.width
-                },
+                element: e.element,
                 x: e.x,
                 y: e.y
             }))
@@ -216,6 +223,26 @@ space.post("/element", userMiddleware, async (req, res) => {
     const { elementId, spaceId, x, y } = parsedData.data
 
     try {
+        const space = await prisma.space.findFirst({
+            where: {
+                id: spaceId
+            }
+        })
+
+        if(!space) {
+            res.status(400).json({
+                message: "No Space exists"
+            })
+            return
+        }
+
+        if (x > space.width || y > space.height) {
+            res.status(400).json({
+                message: "Elements placed outside the space"
+            })
+            return
+        }
+
         const element = await prisma.spaceElements.create({
             data: {
                 spaceId,
@@ -224,6 +251,7 @@ space.post("/element", userMiddleware, async (req, res) => {
                 y
             }
         })
+
 
         res.json({
             message: "Element added to space"

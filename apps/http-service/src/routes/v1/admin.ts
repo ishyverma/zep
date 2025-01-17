@@ -113,15 +113,17 @@ admin.post("/map", async (req, res) => {
                 thumbnail
             }
         })
-    
-        const mapElements = await prisma.mapElements.createMany({
-            data: defaultElements.map(e => ({
-                mapId: map.id,
-                elementId: e.elementId,
-                x: e.x,
-                y: e.y
+
+        await prisma.$transaction(
+            defaultElements.map(e => prisma.mapElements.create({
+                data: {
+                    mapId: map.id,
+                    elementId: e.elementId,
+                    x: e.x,
+                    y: e.y
+                }
             }))
-        })
+        )
     
         res.json({
             id: map.id

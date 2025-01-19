@@ -5,22 +5,13 @@ import { Google } from "@/components/Google";
 import { Input } from "@/components/Input";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { toast, Toaster } from "sonner";
 
-export default function Signin() {
-    const username = useRef<HTMLInputElement | null>(null);
-    const password = useRef<HTMLInputElement | null>(null);
-    const [UsernameError, setUsernameError] = useState<boolean>(false)
-    const [PasswordError, setPasswordError] = useState<boolean>(false)
+export default function Signup() {
+    const [username, setUsername] = useState<string>("")
+    const [password, setPassword] = useState<string>("")
     const router = useRouter();
-
-    async function sendSigninRequest() {
-        const response = await axios.post("http://localhost:3000/api/v1/signin", {
-            
-        })
-    }
-
     return <div className="bg-[#5B6DE1] h-screen w-screen flex justify-center items-center">
         <div className="bg-white py-5 px-8 rounded-3xl shadow-2xl w-[400px]">
             <div className="flex gap-10 justify-center items-center">
@@ -38,7 +29,7 @@ export default function Signin() {
                 <span className="text-lg font-semibold text-[#282D4E]">Welcome Back to Gather</span>
             </div>
             <button onClick={() => {
-                toast.error('Cannot Signin with Google')
+                toast.error('Cannot Signup with Google')
             }} className="flex gap-2 w-full rounded-xl justify-center group hover:border-[#696C83] items-center border-2 border-black py-3 mt-4">
                 <div className="flex w-5">
                     <Google />
@@ -50,54 +41,34 @@ export default function Signin() {
             </div>
             <div className="flex justify-center items-center mt-4">
                 <Input onBlur={(e) => {
-                    username.current = e.target
-                }} ref={username} placeholder="Enter your username" type="text" label="Username" />
-            </div>
-            <div className={`${UsernameError ? "flex" : "hidden"} justify-center items-center mt-2`}>
-                <small className={`text-red-600 font-medium`}>Please enter a valid username.</small>
+                    setUsername(e.target.value)
+                }} placeholder="Enter your username" type="text" label="Username" />
             </div>
             <div className="flex justify-center items-center mt-4">
                 <Input onBlur={(e) => {
-                    password.current = e.target
-                }} ref={password} placeholder="Enter your password" type="password" label="Password" />
+                    setPassword(e.target.value)
+                }} placeholder="Enter your password" type="password" label="Password" />
             </div>
-            <div className={`${PasswordError ? "flex" : "hidden"} justify-center items-center mt-2`}>
-                <small className={`text-red-600 font-medium`}>Please enter a valid password.</small>
-            </div>
+        
             <div className="mt-6">
                 <Button onClick={() => {
-                    if(username.current?.value === ""){
-                        if(password.current?.value === "") {
-                            setPasswordError(true)
-                        } else setPasswordError(false)
-                        setUsernameError(true)
-                    } 
-                    else {
-                        if(username.current?.value === "") {
-                            setUsernameError(true)
-                            if(password.current?.value === "") {
-                                setPasswordError(true)
-                            } else {
-                                setPasswordError(false)
-                            }
-                        } else if (password.current?.value === "") {
-                            setPasswordError(true)
-                            if(username.current?.value === "") {
-                                setUsernameError(true)
-                            } else {
-                                setUsernameError(false)
-                            }
-                        } else {
-                            setUsernameError(false) 
-                            setPasswordError(false)
-                        }
-                    }
+                    axios.post("http://localhost:3000/api/v1/signin", {
+                        username,
+                        password
+                    }).then(response => {
+                        toast.success("Signed In Successfully")
+                        localStorage.setItem("token", response.data.token)
+                        router.push("/en/home/spaces")
+                    }).catch(error => {
+                        toast.error("Signin Failed")
+                        console.log(error)
+                    })
                 }} className="py-3 rounded-xl" isHover={true} label="Sign in with username" variant="primary" />
             </div>
             <div className="flex justify-center items-center mt-4">
-                <span onClick={() => {
+                <span onClick={() => 
                 router.push("/signup")
-            }} className="text-[#4357D7] cursor-pointer text-sm font-semibold">Don't have an account? <span className="underline">Sign Up</span></span>
+            } className="text-[#4357D7] cursor-pointer text-sm font-semibold">Don't have an account? <span className="underline">Sign Up</span></span>
             </div>
         </div>
         <Toaster closeButton richColors position="bottom-right" />

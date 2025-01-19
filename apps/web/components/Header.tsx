@@ -1,6 +1,13 @@
 "use client";
 
-import { useState } from "react";
+interface InfoType {
+    id: string;
+    username: string;
+    avatarId: null | string;
+    type: "user" | "admin"
+}
+
+import { useEffect, useState } from "react";
 import { Button } from "./Button";
 import { DownArrow } from "./DownArrow";
 import { Gather } from "./Gather";
@@ -16,6 +23,7 @@ export function Header() {
     const [first, setFirst] = useState<boolean>(false)
     const [second, setSecond] = useState<boolean>(false)
     const [third, setThird] = useState<boolean>(false)
+
     const router = useRouter();
     const changeColor = () => {
         if(window.scrollY >= 90) {
@@ -25,9 +33,10 @@ export function Header() {
             setColor(false)
         }
     }
-
     // Used to change the color of navbar when we scroll
-    window.addEventListener('scroll', changeColor)
+    if(typeof window !== "undefined") {
+        window.addEventListener('scroll', changeColor)
+    }
 
     return <div className="flex justify-center relative">
         <div className={`fixed top-0 flex justify-center ${color ? "bg-white" : ""} w-full transition-all duration-500`}>

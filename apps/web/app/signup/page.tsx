@@ -5,27 +5,13 @@ import { Google } from "@/components/Google";
 import { Input } from "@/components/Input";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { toast, Toaster } from "sonner";
 
 export default function Signup() {
     const [username, setUsername] = useState<string>("")
     const [password, setPassword] = useState<string>("")
     const router = useRouter();
-    const sendRequest = async () => {
-        return new Promise(async (resolve, reject) => {
-            const response = await axios.post("http://localhost:3000/api/v1/signup", {
-                username,
-                password,
-                type: "user"
-            })
-            if(response.status === 200) resolve
-            else {
-                console.log(response.data)
-                reject
-            }
-        })
-    }
     return <div className="bg-[#5B6DE1] h-screen w-screen flex justify-center items-center">
         <div className="bg-white py-5 px-8 rounded-3xl shadow-2xl w-[400px]">
             <div className="flex gap-10 justify-center items-center">
@@ -66,10 +52,16 @@ export default function Signup() {
         
             <div className="mt-6">
                 <Button onClick={() => {
-                    toast.promise(sendRequest, {
-                        loading: "Please Wait",
-                        success: "Signed Up Successfully Hehe",
-                        error: "Sign Up Failed ❌ Hehe"
+                    axios.post("http://localhost:3000/api/v1/signup", {
+                        username,
+                        password,
+                        type: "user"
+                    }).then(response => {
+                        toast.success("Signed Up Successfully")
+                        router.push("/signin")
+                    }).catch(error => {
+                        toast.error("Signup Failed")
+                        console.log(error)
                     })
                 }} className="py-3 rounded-xl" isHover={true} label="Sign up with username" variant="primary" />
             </div>

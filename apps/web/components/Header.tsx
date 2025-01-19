@@ -8,6 +8,7 @@ import { Menu } from "./Menu";
 import { AccordionMenu } from "./AccordionMenu";
 import { Cross } from "./Cross";
 import { UpArrow } from "./UpArrow";
+import { useRouter } from "next/navigation";
 
 export function Header() {
     const [menu, setMenu] = useState<boolean>(false)
@@ -15,6 +16,7 @@ export function Header() {
     const [first, setFirst] = useState<boolean>(false)
     const [second, setSecond] = useState<boolean>(false)
     const [third, setThird] = useState<boolean>(false)
+    const router = useRouter();
     const changeColor = () => {
         if(window.scrollY >= 90) {
             setColor(true)
@@ -144,7 +146,9 @@ export function Header() {
                             <div>
                                 <Button variant="primary" label="Get started" isHover={true} />
                             </div>
-                            <div>
+                            <div onClick={() => {
+                                router.push("/signin")
+                            }}>
                                 <Button variant="secondary" label="Sign In" isHover={false} />
                             </div>
                         </div>

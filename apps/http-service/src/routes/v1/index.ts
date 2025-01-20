@@ -5,12 +5,62 @@ import jwt from "jsonwebtoken";
 import { user } from "./user";
 import { space } from "./space";
 import { admin } from "./admin";
+import { userMiddleware } from "../../middleware/user";
 
 export const router = Router()
 
 router.use("/user", user)
 router.use("/space", space)
 router.use("/admin", admin)
+
+router.get("/map/all", userMiddleware, async (req, res) => {
+    try {
+        const maps = await prisma.map.findMany({})
+        res.json({
+            maps: maps.map(m => ({
+                id: m.id,
+                name: m.name,
+                dimensions: `${m.width}x${m.height}`,
+                thumbnail: m.thumbnail
+            }))
+        })
+        return
+    } catch (e) {
+        res.status(400).json({
+            message: "There was some error"
+        })
+        return
+    }
+})
+
+router.get("/me", userMiddleware, async (req, res) => {
+    try {
+        const user = await prisma.user.findFirst({
+            where: {
+                id: req.userId
+            },
+            omit: {
+                password: true
+            }
+        })
+        if(!user) {
+            res.status(400).json({
+                message: "There is no user with this id"
+            })
+            return
+        }
+
+        res.json({
+            user
+        })
+
+    } catch (e) {
+        res.status(400).json({
+            message: "There was some error"
+        })
+        return
+    }
+})
 
 router.post("/signup", async (req, res) => {
     const parsedData = SignupType.safeParse(req.body)

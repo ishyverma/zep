@@ -16,12 +16,14 @@ import { Cross } from "./Cross";
 import { UpArrow } from "./UpArrow";
 import { useRouter } from "next/navigation";
 import { useInformation } from "@/hooks/useInformation";
+import { Exit } from "./Exit";
 
 export function DashboardNavbar() {
     const [menu, setMenu] = useState<boolean>(false)
     const [color, setColor] = useState<boolean>(true)
     const [first, setFirst] = useState<boolean>(false)
     const [second, setSecond] = useState<boolean>(false)
+    const [logout, setLogout] = useState<boolean>(false)
     let storage;
     if(typeof window !== 'undefined'){
         storage = localStorage.getItem("token")
@@ -101,13 +103,28 @@ export function DashboardNavbar() {
                             </div>
                         </div>
                     </div>
-                    <div className="text-black flex gap-2 justify-center items-center cursor-pointer">
-                        <div>
+                    <div className="text-black flex gap-2 justify-center items-center relative">
+                        <div className="cursor-pointer" onClick={() => {
+                            setLogout(prev => !prev)
+                        }}>
                             {data.username}
                         </div>
-                        <div>
+                        <div className="cursor-pointer" onClick={() => {
+                            setLogout(prev => !prev)
+                        }}>
                             <DownArrow />
                         </div>
+                        {logout && <div className={`absolute bg-white text-black border border-[#9C9FA5] rounded-lg top-7 cursor-pointer right-2`}>
+                            <div onClick={() => {
+                                localStorage.removeItem("token")
+                                router.push("/signin")
+                            }} className="flex items-center justify-center font-medium hover:bg-[#D2D2D2] rounded-lg my-2 mx-2 py-2 w-28 transition-all duration-100">
+                                <div><Exit /></div>
+                                <div>
+                                    Sign Out
+                                </div>
+                            </div>
+                        </div>}
                     </div>
                 </div>
             </div>

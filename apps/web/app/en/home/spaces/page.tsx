@@ -55,7 +55,9 @@ export default function Spaces() {
                 setIsOpen(false)
             }
         }} className={`bg-white ${isOpen || isSecond ? "brightness-50 overflow-hidden": "brightness-100"} relative`}>
-            <DashboardNavbar />
+            <div className="z-50 relative">
+                <DashboardNavbar />
+            </div>
             <div className="flex justify-center items-center">
                 <div className="mt-24 w-[90vw] flex gap-10">
                     <MovingCard image="https://asset-zepetoful.zepeto.io/lZS2as4ZxDWZ/VSxoN3wK879tUU0gPKuAocC/4xWOc3wK87v393d0eb4d2c545d826ffca1c87ca2128tUU0hW3snObC/%EB%8F%99%EB%AC%BC%20%EC%88%A0%EB%9E%98%EC%9E%A1%EA%B8%B0.png" />

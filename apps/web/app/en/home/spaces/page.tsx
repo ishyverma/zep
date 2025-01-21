@@ -18,8 +18,9 @@ import { toast, Toaster } from "sonner";
 export default function Spaces() {
     const inputRef = useRef<HTMLInputElement>(null)
     let token: string;
-    const [maps, setMaps] = useState<dataType[]>()
+    const [maps, setMaps] = useState<dataType[] | null>()
     const [currLength, setCurrLength] = useState(0)
+    const [currentMap, setCurrentMap] = useState<dataType>()
     useEffect(() => {
         axios.get("http://localhost:3000/api/v1/map/all", {
             headers: {
@@ -31,7 +32,7 @@ export default function Spaces() {
     }, [])
 
     const [isOpen, setIsOpen] = useState(false)
-    const [isSecond, setIsSecond] = useState(true)
+    const [isSecond, setIsSecond] = useState(false)
     const [value, setValue] = useState("")
 
     if(typeof window !== "undefined") {
@@ -41,17 +42,6 @@ export default function Spaces() {
                 setIsOpen(false)
                 setIsSecond(false)
             }
-        })
-    }
-
-    async function createSpace(m: dataType) {
-        axios.post("http://localhost:3000/api/v1/space", {
-            dimensions: m.dimensions,
-            name: value,
-            thumbnail: m.thumbnail,
-            mapId: m.id
-        }).then(response => {
-            toast.success("Space created successfully")
         })
     }
 
@@ -131,7 +121,7 @@ export default function Spaces() {
                 </div>
             </div>
         </div>
-        {isSecond && <div className="flex absolute w-[450px] top-96 left-[505px] rounded-xl bg-white opacity-100 justify-center items-center mx-auto z-20 shadow-2xl">
+        {isSecond && <div className="flex absolute w-[450px] top-52 left-[505px] rounded-xl bg-white opacity-100 justify-center items-center mx-auto z-20 shadow-2xl">
             <div className="w-[90%]">
                 <div className="flex justify-between w-full items-center mt-3">
                     <div className="font-semibold">
@@ -165,10 +155,17 @@ export default function Spaces() {
                     </div>
                     <div className="mt-4">
                         <button onClick={() => {
-                            axios.post("http://locahost:3000/api/v1/space", {
-                                dimensions: ""
+                            axios.post("http://localhost:3000/api/v1/space", {
+                                dimensions: currentMap?.dimensions,
+                                name: inputRef.current?.value,
+                                mapId: currentMap?.id,
+                                thumbnail: currentMap?.thumbnail
+                            }, {
+                                headers: {
+                                    authorization: `Bearer ${token}`
+                                }
                             })
-                        }} className={`text-center w-full ${currLength ? "bg-[#6758FF]" : "bg-[#F3F2FF]"} text-white text-sm font-bold border-[#D5D9DF]/50 border py-2 rounded-lg`}>Create</button>
+                        }} className={`text-center w-full ${currLength ? "bg-[#6758FF] cursor-pointer" : "bg-[#F3F2FF] cursor-not-allowed"} text-white text-sm font-bold border-[#D5D9DF]/50 border py-2 rounded-lg`}>Create</button>
                     </div>
                 </div>
             </div>
@@ -237,7 +234,7 @@ export default function Spaces() {
                                 <img onClick={() => {
                                     setIsSecond(true)
                                     setIsOpen(false)
-                                    createSpace(m)
+                                    setCurrentMap(m)
                                 }} width={240} className="rounded-lg hover:scale-110 transition-all duration-100" src={m.thumbnail} alt="" />
                             </div>
                             <div className="text-xs text-[#8C9096] font-semibold mt-2">

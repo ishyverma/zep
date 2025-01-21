@@ -28,7 +28,7 @@ export function DashboardNavbar() {
     }
     const data = useInformation(storage || "") as InfoType
     const router = useRouter();
-    return <div className="flex justify-center relative">
+    return <div className="flex justify-center relative bg-white">
         <div className={`fixed top-0 flex justify-center w-full transition-all duration-500`}>
             <div className="w-[90vw]">
                 <div className="flex justify-between items-center">

@@ -3,10 +3,13 @@ import { useEffect, useState } from "react";
 import { ThreeDots } from "./ThreeDots";
 import { Bin } from "./Bin";
 import { Thunder } from "./Thunder";
+import { toast, Toaster } from "sonner";
+import { useRouter } from "next/navigation";
 
 export function ExistingSpaces() {
     const [spaces, setSpaces] = useState<ExistingSpaces[]>()
     let token: string;
+    const router = useRouter();
     const [isOpen, setIsOpen] = useState<any>({})
     const toggle = (id: number) => {
         setIsOpen({...isOpen, [id]: !isOpen[id]})
@@ -32,7 +35,9 @@ export function ExistingSpaces() {
 
     return <div className="grid grid-cols-4 mt-20 mb-40 gap-4">
         {spaces.map(space => <div key={space.id} className="mt-3">
-            <img className="rounded-lg" width={330} src={space.thumbnail} alt="" />
+            <img onClick={() => {
+                router.push(`/play/${space.id}`)
+            }} className="rounded-lg cursor-pointer" width={330} src={space.thumbnail} alt="" />
             <div className="flex justify-center items-end flex-col">
                 <div className="flex justify-between items-center mt-2 w-full">
                     <div className="text-base font-medium">{space.name}</div>
@@ -57,11 +62,22 @@ export function ExistingSpaces() {
                         <div className="text-red-600">
                             <Bin />
                         </div>
-                        <div>
+                        <div onClick={() => {
+                            axios.delete(`http://localhost:3000/api/v1/space/${space.id}`, {
+                                headers: {
+                                    authorization: `Bearer ${token}`
+                                }
+                            }).then(response => {
+                                toast.success("Space Deleted Successfully")
+                            })
+                        }}>
                             Delete From List
                         </div>
                     </div>
                 </div>
+            </div>
+            <div>
+                <Toaster richColors position="bottom-right" />
             </div>
         </div>)}
     </div>

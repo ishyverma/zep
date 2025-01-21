@@ -105,9 +105,44 @@ space.post("/", userMiddleware, async (req, res) => {
 space.delete("/:spaceId", userMiddleware, async (req, res) => {
     const { spaceId } = req.params
     try {
-        const space = await prisma.space.delete({
+        const space = await prisma.space.findFirst({
             where: {
                 id: spaceId
+            },
+            select: {
+                elements: {
+                    select: {
+                        id: true
+                    }
+                },
+                creatorId: true,
+                id: true
+            }
+        })
+
+        if(!space) {
+            return;
+        }
+
+        const spaceElement = await prisma.spaceElements.deleteMany({
+            where: {
+                spaceId: {
+                    in: [space.id]
+                }
+            }
+        })
+
+        const space2 = await prisma.space.delete({
+            where: {
+                id: spaceId
+            },
+            select: {
+                elements: {
+                    select: {
+                        id: true
+                    }
+                },
+                creatorId: true
             }
         })
 
@@ -124,6 +159,7 @@ space.delete("/:spaceId", userMiddleware, async (req, res) => {
         return
 
     } catch (e) {
+        console.log(e)
         res.status(400).json({
             message: "There was some error"
         })

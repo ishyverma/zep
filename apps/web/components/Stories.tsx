@@ -34,8 +34,10 @@ export function Stories() {
                     <Circle />
                 </div>
             </div>
-            <div className="flex justify-center items-center mt-16">
-                <Button className="py-[15px] w-64" variant="tertiary" isHover={true} label="View More Testimonials" />
+            <div className="flex justify-center">
+                <div className="flex justify-center items-center mt-16 w-[300px]">
+                    <Button className="py-[15px] w-20" variant="tertiary" isHover={true} label="View More Testimonials" />
+                </div>
             </div>
             <div className="md:mt-40 mt-20 flex gap-10 items-center justify-center">
                 <div>
